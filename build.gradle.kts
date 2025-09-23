@@ -30,7 +30,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
+    testImplementation("org.hibernate.validator:hibernate-validator:8.0.3.Final")
 }
 
 publishing {
