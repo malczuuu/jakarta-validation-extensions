@@ -1,0 +1,13 @@
+.gradle/
+.kotlin/
+
+/build/
+/out/
+
+/buildSrc/build/
+/buildSrc/out/
+
+### IDEs ###
+/.idea/
+/.vscode/
+*.iml
