@@ -9,15 +9,15 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import java.util.Set;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class OneOfValidatorTest {
 
-  private Validator validator;
+  private static Validator validator;
 
-  @BeforeEach
-  void beforeEach() {
+  @BeforeAll
+  static void beforeAll() {
     try (ValidatorFactory factory =
         Validation.byDefaultProvider()
             .configure()
