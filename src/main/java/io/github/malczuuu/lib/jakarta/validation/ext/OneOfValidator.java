@@ -17,7 +17,7 @@ public class OneOfValidator implements ConstraintValidator<OneOf, Object> {
   @Override
   public void initialize(OneOf constraintAnnotation) {
     values = Set.of(constraintAnnotation.values());
-    valuesIgnoreCase = values.stream().map(String::toLowerCase).collect(toSet());
+    valuesIgnoreCase = values.stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(toSet());
     ignoreCase = constraintAnnotation.ignoreCase();
   }
 
