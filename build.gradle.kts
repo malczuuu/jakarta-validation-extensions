@@ -59,6 +59,11 @@ publishing {
                         url.set("https://opensource.org/licenses/MIT")
                     }
                 }
+                developers {
+                    developer {
+                        id = "malczuuu"
+                    }
+                }
                 issueManagement {
                     system = "GitHub Issues"
                     url = "https://github.com/malczuuu/${project.name}/issues"
