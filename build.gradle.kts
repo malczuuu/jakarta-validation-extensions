@@ -49,10 +49,10 @@ publishing {
             from(components["java"])
 
             pom {
-                name.set(project.name)
-                description.set("A tiny set of annotations that extend Jakarta Bean Validation.")
-                url.set("https://github.com/malczuuu/${project.name}")
-                inceptionYear.set("2025")
+                name = project.name
+                description = "A tiny set of annotations that extend Jakarta Bean Validation."
+                url = "https://github.com/malczuuu/${project.name}"
+                inceptionYear = "2025"
                 licenses {
                     license {
                         name.set("MIT License")
@@ -62,6 +62,8 @@ publishing {
                 developers {
                     developer {
                         id = "malczuuu"
+                        name = "Damian Malczewski"
+                        url = "https://github.com/malczuuu"
                     }
                 }
                 issueManagement {
