@@ -52,18 +52,16 @@ publishing {
                 name.set(project.name)
                 description.set("A tiny set of annotations that extend Jakarta Bean Validation.")
                 url.set("https://github.com/malczuuu/${project.name}")
+                inceptionYear.set("2025")
                 licenses {
                     license {
                         name.set("MIT License")
                         url.set("https://opensource.org/licenses/MIT")
                     }
                 }
-                developers {
-                    developer {
-                        id = "malczuuu"
-                        name = "Damian Malczewski"
-                        email = "damian.m.malczewski@gmail.com"
-                    }
+                issueManagement {
+                    system = "GitHub Issues"
+                    url = "https://github.com/malczuuu/${project.name}/issues"
                 }
                 scm {
                     connection = "scm:git:git://github.com/malczuuu/${project.name}.git"
