@@ -1,6 +1,7 @@
 # Publishing
 
-Publishing memo for setting up CI/CD to publish artifacts to Maven Central via Sonatype.
+This project was primarily created to learn about setting up CI/CD for publishing artifacts to Maven Central via
+Sonatype. Therefore, this is a memo that summarizes the steps taken to achieve this.
 
 ## Table of Contents
 
