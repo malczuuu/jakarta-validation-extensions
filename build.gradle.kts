@@ -77,8 +77,8 @@ publishing {
 
 nmcpAggregation {
     centralPortal {
-        username = System.getenv("PUBLISH_USERNAME")
-        password = System.getenv("PUBLISH_PASSWORD")
+        username = System.getenv("PUBLISHING_USERNAME")
+        password = System.getenv("PUBLISHING_PASSWORD")
 
         publishingType = "USER_MANAGED"
     }
