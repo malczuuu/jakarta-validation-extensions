@@ -9,6 +9,8 @@ Publishing memo for setting up CI/CD to publish artifacts to Maven Central via S
 
 ## CI/CD Setup
 
+See [`gradle-release.yml`](.github/workflows/gradle-release.yml).
+
 Set the following environment variables in your CI/CD (GitHub Actions, etc.):
 
 ```txt
@@ -24,7 +26,7 @@ SIGNING_PASSWORD=<PGP password>
 Artifacts are published to Maven Central via Sonatype, using following Gradle task.
 
 ```bash
-./gradlew -Pversion=<version> clean build publishAggregationToCentralPortal
+./gradlew -Pversion=<version> -Psign publishAggregationToCentralPortal
 ```
 
 This command uses `nmcp` Gradle plugin - [link](https://github.com/GradleUp/nmcp).
@@ -64,6 +66,7 @@ the artifacts to Maven Central.
 4. Export your public key to a .asc file (optional)
    ```bash
    gpg --armor --export 11223344556677889900AABBCCDDEEFF11223344 > publickey.asc
+   gpg --armor --export-secret-keys 11223344556677889900AABBCCDDEEFF11223344 > privatekey.asc
    ```
 5. Use the key in Gradle for signing (`build.gradle.kts`). In your Gradle build, you can reference environment variables
    for CI:
@@ -77,7 +80,7 @@ the artifacts to Maven Central.
    }
    signing {
        useInMemoryPgpKeys(
-           System.getenv("SIGNING_KEY"),      // content of publickey.asc file from step 4
+           System.getenv("SIGNING_KEY"),      // content of privatekey.asc file from step 4
            System.getenv("SIGNING_PASSWORD")  // passphrase for the PGP key selected in step 1
        )
        sign(publishing.publications["maven"])
