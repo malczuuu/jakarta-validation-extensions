@@ -3,14 +3,22 @@ import com.diffplug.spotless.LineEnding
 plugins {
     `java-library`
     `maven-publish`
-    id("com.diffplug.spotless") version "7.2.1"
+    signing
+    id("com.diffplug.spotless").version("7.2.1")
+    id("com.gradleup.nmcp.aggregation").version("1.1.0")
 }
 
+group = "io.github.malczuuu"
+
 /**
- * TODO: replace with actual group
+ * In order to avoid hardcoding snapshot versions, we derive the version from the current Git commit hash. For CI/CD add
+ * -Pversion={releaseVersion} parameter to match Git tag.
  */
-group = if (group == "") "io.github.malczuuu" else group
-version = if (version == "unspecified") getSnapshotVersion(rootProject.rootDir) else version
+version =
+    if (version == "unspecified")
+        getSnapshotVersion(rootProject.rootDir)
+    else
+        version
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(11))
@@ -23,10 +31,9 @@ repositories {
 }
 
 dependencies {
-    api("jakarta.validation:jakarta.validation-api:3.1.1")
+    api("jakarta.validation:jakarta.validation-api:3.0.2")
 
     testImplementation(platform("org.junit:junit-bom:5.13.4"))
-
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
@@ -43,7 +50,7 @@ publishing {
 
             pom {
                 name.set(project.name)
-                description.set("Jakarta Bean Validation extensions")
+                description.set("A tiny set of annotations that extend Jakarta Bean Validation.")
                 url.set("https://github.com/malczuuu/${project.name}")
                 licenses {
                     license {
@@ -51,8 +58,40 @@ publishing {
                         url.set("https://opensource.org/licenses/MIT")
                     }
                 }
+                developers {
+                    developer {
+                        id = "malczuuu"
+                        name = "Damian Malczewski"
+                        email = "damian.m.malczewski@gmail.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/malczuuu/${project.name}.git"
+                    developerConnection = "scm:git:git@github.com:malczuuu/${project.name}.git"
+                    url = "https://github.com/malczuuu/${project.name}"
+                }
             }
         }
+    }
+}
+
+nmcpAggregation {
+    centralPortal {
+        username = System.getenv("PUBLISH_USERNAME")
+        password = System.getenv("PUBLISH_PASSWORD")
+
+        publishingType = "USER_MANAGED"
+    }
+    publishAllProjectsProbablyBreakingProjectIsolation()
+}
+
+signing {
+    if (project.hasProperty("sign")) {
+        useInMemoryPgpKeys(
+            System.getenv("SIGNING_KEY"),
+            System.getenv("SIGNING_PASSWORD")
+        )
+        sign(publishing.publications["maven"])
     }
 }
 
@@ -61,7 +100,7 @@ spotless {
         target("**/*.gradle.kts", "**/.gitattributes", "**/.gitignore")
 
         trimTrailingWhitespace()
-        leadingTabsToSpaces(4)
+        leadingTabsToSpaces(2)
         endWithNewline()
         lineEndings = LineEnding.UNIX
     }
