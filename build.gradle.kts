@@ -1,9 +1,9 @@
 import com.diffplug.spotless.LineEnding
 
 plugins {
-    `java-library`
-    `maven-publish`
-    signing
+    id("java-library")
+    id("maven-publish")
+    id("signing")
     id("com.diffplug.spotless").version("7.2.1")
     id("com.gradleup.nmcp.aggregation").version("1.1.0")
 }
