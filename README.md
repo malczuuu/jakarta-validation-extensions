@@ -13,13 +13,13 @@ higher is required to use this library.
   <dependency>
       <groupId>io.github.malczuuu</groupId>
       <artifactId>jakarta-validation-extensions</artifactId>
-      <version>1.0.0-alpha2</version>
+      <version>1.0.0-alpha4</version>
   </dependency>
   ```
 * Gradle
   ```kotlin
   dependencies {
-      implementation("io.github.malczuuu:jakarta-validation-extensions:1.0.0-alpha2")
+      implementation("io.github.malczuuu:jakarta-validation-extensions:1.0.0-alpha4")
   }
   ```
 
