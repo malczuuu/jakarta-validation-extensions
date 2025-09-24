@@ -21,7 +21,7 @@ version =
         version
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+    toolchain.languageVersion = JavaLanguageVersion.of(11)
     withSourcesJar()
     withJavadocJar()
 }
@@ -55,8 +55,8 @@ publishing {
                 inceptionYear = "2025"
                 licenses {
                     license {
-                        name.set("MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
+                        name = "MIT License"
+                        url = "https://opensource.org/licenses/MIT"
                     }
                 }
                 developers {
