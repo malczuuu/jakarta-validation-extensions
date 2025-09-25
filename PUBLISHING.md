@@ -5,8 +5,13 @@ Central via Sonatype. Therefore, this is a memo that summarizes the steps taken 
 
 ## Table of Contents
 
+- [Info](#info)
 - [CI/CD Setup](#cicd-setup)
 - [Setting up PGP Key](#setting-up-pgp-key)
+
+## Info
+
+Keep Git tags with `vX.Y.Z-suffix` format. GitHub Actions job will only trigger on such tags and will remove `v` prefix.
 
 ## CI/CD Setup
 
