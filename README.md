@@ -15,7 +15,7 @@ higher is required to use this library.
   <dependency>
       <groupId>io.github.malczuuu</groupId>
       <artifactId>jakarta-validation-extensions</artifactId>
-      <version>1.0.0-alpha4</version>
+      <version>1.0.0</version>
   </dependency>
   ```
 * Gradle
