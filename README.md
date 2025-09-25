@@ -21,7 +21,7 @@ higher is required to use this library.
 * Gradle
   ```kotlin
   dependencies {
-      implementation("io.github.malczuuu:jakarta-validation-extensions:1.0.0-alpha4")
+      implementation("io.github.malczuuu:jakarta-validation-extensions:1.0.0")
   }
   ```
 
