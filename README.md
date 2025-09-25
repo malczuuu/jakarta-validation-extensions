@@ -3,6 +3,8 @@
 This project provides additional features and extensions for Jakarta Validation (Bean Validation). It includes custom
 validation annotations.
 
+> A small project to experiment with publishing artifacts to Maven Central and see what eventually comes of it.
+
 ## Usage
 
 Add library as dependency to Maven or Gradle. See the actual versions on [Maven Central][maven-central]. **Java 11** or
