@@ -17,6 +17,8 @@ import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class AlphanumericValidatorTest {
 
@@ -51,18 +53,20 @@ class AlphanumericValidatorTest {
     }
   }
 
-  @Test
-  void givenValidString_whenValidating_thenNoViolation() {
-    StringBean bean = new StringBean("abc123");
+  @ParameterizedTest
+  @ValueSource(strings = {"abc123", "ABC123"})
+  void givenValidString_whenValidating_thenNoViolation(String value) {
+    StringBean bean = new StringBean(value);
 
     Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
 
     assertTrue(violations.isEmpty());
   }
 
-  @Test
-  void givenInvalidString_whenValidating_thenViolation() {
-    StringBean bean = new StringBean("abc-123!");
+  @ParameterizedTest
+  @ValueSource(strings = {"abc-123!", "ABC-123!"})
+  void givenInvalidString_whenValidating_thenViolation(String value) {
+    StringBean bean = new StringBean(value);
 
     Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
 
