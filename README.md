@@ -27,8 +27,10 @@ higher is required to use this library.
 
 ## Features
 
-- **`@OneOf`** - validates that a value is one of the specified values. Supported types include `String`, `Number`,
-  `Enum` and `Character`.
+- **`@OneOf`** - validates that a value is one of the specified values. Supported types include `CharSequence` (generic
+  for `String` in particular, but also `StringBuilder` etc.), `Number`, `Enum` and `Character`.
+- **`@Alphanumeric`** - validates that a value contains only alphanumeric characters (`a-z`, `A-Z`, `0-9`), with
+  optional characters to ignore. Supported types include `CharSequence`, and `Character`.
 
 ## Versioning
 
