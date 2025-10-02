@@ -37,7 +37,7 @@ public class OneOfValidator implements ConstraintValidator<OneOf, Object> {
    * <p>Supported types are:
    *
    * <ul>
-   *   <li>{@code String}
+   *   <li>{@code CharSequence} ({@code String} in particular, but also {@code StringBuilder} etc.)
    *   <li>{@code Enum}
    *   <li>{@code Number} (compared to {@code values} with {@code Number::toString})
    *   <li>{@code Character}
@@ -70,14 +70,11 @@ public class OneOfValidator implements ConstraintValidator<OneOf, Object> {
    * @throws IllegalArgumentException if the value type is not supported
    */
   private String toValidableString(Object value) throws IllegalArgumentException {
-    if (value instanceof String) {
-      return (String) value;
+    if (value instanceof CharSequence || value instanceof Number || value instanceof Character) {
+      return value.toString();
     }
     if (value instanceof Enum<?>) {
       return ((Enum<?>) value).name();
-    }
-    if (value instanceof Number || value instanceof Character) {
-      return value.toString();
     }
     throw new IllegalArgumentException(
         OneOf.class.getSimpleName() + " not supported for " + value.getClass().getName() + " type");

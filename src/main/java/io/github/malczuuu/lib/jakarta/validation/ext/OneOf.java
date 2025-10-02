@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  * <p>Supported types are:
  *
  * <ul>
- *   <li>{@code String}
+ *   <li>{@code CharSequence} ({@code String} in particular, but also {@code StringBuilder} etc.)
  *   <li>{@code Enum}
  *   <li>{@code Number} (compared to {@code values} with {@code Number::toString})
  *   <li>{@code Character}
