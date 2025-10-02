@@ -1,5 +1,9 @@
 # Jakarta Validation Extensions
 
+[![Build Status](https://github.com/malczuuu/jakarta-validation-extension/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/malczuuu/jakarta-validation-extension/actions/workflows/gradle-build.yml)
+[![Sonatype](https://img.shields.io/maven-central/v/io.github.malczuuu.problem4j/jakarta-validation-extension)](https://central.sonatype.com/artifact/io.github.malczuuu.problem4j/jakarta-validation-extension)
+[![License](https://img.shields.io/github/license/malczuuu/jakarta-validation-extension)](https://github.com/malczuuu/jakarta-validation-extension/blob/main/LICENSE)
+
 This project provides additional features and extensions for Jakarta Validation (Bean Validation). It includes custom
 validation annotations.
 
@@ -15,13 +19,13 @@ higher is required to use this library.
   <dependency>
       <groupId>io.github.malczuuu</groupId>
       <artifactId>jakarta-validation-extensions</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
   </dependency>
   ```
 * Gradle
   ```kotlin
   dependencies {
-      implementation("io.github.malczuuu:jakarta-validation-extensions:1.0.0")
+      implementation("io.github.malczuuu:jakarta-validation-extensions:1.1.0")
   }
   ```
 
