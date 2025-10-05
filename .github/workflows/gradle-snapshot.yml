@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (must match vX.Y.Z)'
+        description: 'Version to release as a snapshot (format: "vX.Y.Z"; CI automatically adds "-SNAPSHOT" suffix)'
         required: true
         default: 'v1.0.0'
 
