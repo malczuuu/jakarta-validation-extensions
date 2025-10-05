@@ -39,7 +39,7 @@ jobs:
           PUBLISHING_USERNAME: ${{ secrets.PUBLISHING_USERNAME }}
           PUBLISHING_PASSWORD: ${{ secrets.PUBLISHING_PASSWORD }}
         run: |
-          BASE_VERSION="${{ github.event.inputs.version#v }}"  # remove leading 'v'
-          SNAPSHOT_VERSION="${BASE_VERSION}-SNAPSHOT"
+          BASE_VERSION="${{ github.event.inputs.version }}"
+          SNAPSHOT_VERSION="${BASE_VERSION#v}-SNAPSHOT"  # removes leading 'v' from tag name
           echo "Publishing snapshot version $SNAPSHOT_VERSION"
           ./gradlew -Pversion="$SNAPSHOT_VERSION" -Psign publishAggregationToCentralPortalSnapshots
