@@ -1,9 +1,12 @@
-name: Gradle Snapshot
+name: Gradle Snapshot (Manual)
 
 on:
-  push:
-    tags:
-      - "v[0-9]*.[0-9]*.[0-9]*-*"  # pattern for v1.2.3-suffix
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (must match vX.Y.Z)'
+        required: true
+        default: 'v1.0.0'
 
 jobs:
   publish:
@@ -19,18 +22,24 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
-      # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-      # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Publish with Gradle Wrapper
+      - name: Validate version input
+        run: |
+          if [[ ! "${{ github.event.inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format. Must match vX.Y.Z"
+            exit 1
+          fi
+
+      - name: Publish Snapshot with Gradle Wrapper
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
           PUBLISHING_USERNAME: ${{ secrets.PUBLISHING_USERNAME }}
           PUBLISHING_PASSWORD: ${{ secrets.PUBLISHING_PASSWORD }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"  # removes leading 'v' from tag name
-          echo "Publishing version $VERSION"
-          ./gradlew -Pversion="$VERSION" -Psign publishAggregationToCentralPortalSnapshots
+          BASE_VERSION="${{ github.event.inputs.version#v }}"  # remove leading 'v'
+          SNAPSHOT_VERSION="${BASE_VERSION}-SNAPSHOT"
+          echo "Publishing snapshot version $SNAPSHOT_VERSION"
+          ./gradlew -Pversion="$SNAPSHOT_VERSION" -Psign publishAggregationToCentralPortalSnapshots
