@@ -42,4 +42,4 @@ jobs:
           BASE_VERSION="${{ github.event.inputs.version }}"
           SNAPSHOT_VERSION="${BASE_VERSION#v}-SNAPSHOT"  # removes leading 'v' from tag name
           echo "Publishing snapshot version $SNAPSHOT_VERSION"
-          ./gradlew -Pversion="$SNAPSHOT_VERSION" -Psign publishAggregationToCentralPortalSnapshots
+          ./gradlew -Pversion="$SNAPSHOT_VERSION" -Psign publishAllPublicationsToCentralPortalSnapshots
