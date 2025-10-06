@@ -38,7 +38,7 @@ jobs:
           if [ -n "${VERSION_FILE:-}" ] && [ -f "$VERSION_FILE" ]; then
             bash .github/utils/validate_version_file.sh "$VERSION_FILE"
             NEXT_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')  # trim whitespaces
-            echo "::notice::using version from $VERSION_FILE: $VERSION"
+            echo "::notice::using version from $VERSION_FILE: $NEXT_VERSION"
           else
             echo "::error::file $VERSION_FILE not found"
             exit 1
@@ -57,4 +57,4 @@ jobs:
           PUBLISHING_USERNAME: ${{ secrets.PUBLISHING_USERNAME }}
           PUBLISHING_PASSWORD: ${{ secrets.PUBLISHING_PASSWORD }}
         run: |
-          ./gradlew -Pversion="$SNAPSHOT_VERSION" -Psign publishAllPublicationsToCentralPortalSnapshots
+          ./gradlew -Pversion="${{ steps.version.outputs.version }}" -Psign publishAllPublicationsToCentralPortalSnapshots
