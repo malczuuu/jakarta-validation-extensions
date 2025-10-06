@@ -5,10 +5,12 @@ on:
     branches: [ "main" ]
     paths:
       - ".github/utils/next_version.txt"
+      - ".github/utils/validate_version_file.sh"
       - ".github/workflows/validate-next_version.txt.yml"
   pull_request:
     paths:
       - ".github/utils/next_version.txt"
+      - ".github/utils/validate_version_file.sh"
       - ".github/workflows/validate-next_version.txt.yml"
 
 jobs:
