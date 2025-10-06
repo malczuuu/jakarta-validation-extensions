@@ -1,15 +1,15 @@
-name: Validate next_version.txt
+name: Validate [next_version.txt]
 
 on:
   push:
     branches: [ "main" ]
     paths:
       - ".github/utils/next_version.txt"
-      - ".github/workflows/validate-version-next.yml"
+      - ".github/workflows/validate-next_version.txt.yml"
   pull_request:
     paths:
       - ".github/utils/next_version.txt"
-      - ".github/workflows/validate-version-next.yml"
+      - ".github/workflows/validate-next_version.txt.yml"
 
 jobs:
   validate:
