@@ -15,10 +15,11 @@ group = "io.github.malczuuu"
  * -Pversion={releaseVersion} parameter to match Git tag.
  */
 version =
-    if (version == "unspecified")
+    if (version == "unspecified") {
         getSnapshotVersion(rootProject.rootDir)
-    else
+    } else {
         version
+    }
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(11)
@@ -81,7 +82,7 @@ publishing {
 }
 
 nmcp {
-    publishAllPublicationsToCentralPortal  {
+    publishAllPublicationsToCentralPortal {
         username = System.getenv("PUBLISHING_USERNAME")
         password = System.getenv("PUBLISHING_PASSWORD")
 
@@ -93,7 +94,7 @@ signing {
     if (project.hasProperty("sign")) {
         useInMemoryPgpKeys(
             System.getenv("SIGNING_KEY"),
-            System.getenv("SIGNING_PASSWORD")
+            System.getenv("SIGNING_PASSWORD"),
         )
         sign(publishing.publications["maven"])
     }
@@ -101,18 +102,35 @@ signing {
 
 spotless {
     format("misc") {
-        target("**/*.gradle.kts", "**/.gitattributes", "**/.gitignore")
+        target("**/.gitattributes", "**/.gitignore")
 
         trimTrailingWhitespace()
-        leadingTabsToSpaces(2)
+        leadingTabsToSpaces(4)
         endWithNewline()
         lineEndings = LineEnding.UNIX
     }
 
     java {
-        target("src/**/*.java")
+        target("**/src/**/*.java")
 
         googleJavaFormat("1.28.0")
+        forbidWildcardImports()
+        lineEndings = LineEnding.UNIX
+    }
+
+    kotlin {
+        target("**/src/**/*.kt")
+
+        ktfmt("0.59").metaStyle()
+        endWithNewline()
+        lineEndings = LineEnding.UNIX
+    }
+
+    kotlinGradle {
+        target("**/*.gradle.kts")
+
+        ktlint("1.7.1").editorConfigOverride(mapOf("max_line_length" to "120"))
+        endWithNewline()
         lineEndings = LineEnding.UNIX
     }
 }
