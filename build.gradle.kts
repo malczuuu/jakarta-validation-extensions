@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    api("jakarta.validation:jakarta.validation-api:3.0.2")
+    api("jakarta.validation:jakarta.validation-api:3.1.1")
 
     testImplementation(platform("org.junit:junit-bom:5.14.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
