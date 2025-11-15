@@ -1,13 +1,21 @@
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "quarterly"
+    target-branch: main
+    open-pull-requests-limit: 10
+
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "cron"
-      cronjob: "0 0 * * 0"  # Every Sunday at midnight UTC
-    open-pull-requests-limit: 5
+      interval: "quarterly"
+    target-branch: main
+    open-pull-requests-limit: 10
     allow:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "*"
-        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
+        update-types:
+          - "version-update:semver-major"

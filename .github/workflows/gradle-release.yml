@@ -3,8 +3,7 @@ name: Gradle Release
 on:
   push:
     tags:
-      - "v[0-9]*.[0-9]*.[0-9]*"    # pattern for v1.2.3
-      - "v[0-9]*.[0-9]*.[0-9]*-*"  # pattern for v1.2.3-suffix
+      - "v[0-9]*.[0-9]*.[0-9]*"  # pattern for v1.2.3
 
 jobs:
   publish:
