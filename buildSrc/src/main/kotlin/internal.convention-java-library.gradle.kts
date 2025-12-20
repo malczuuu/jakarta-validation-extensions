@@ -25,7 +25,7 @@ tasks.withType<Jar>().configureEach {
             "Created-By" to "Gradle ${gradle.gradleVersion}",
         )
     }
-    from("../LICENSE") {
+    from("LICENSE") {
         into("META-INF/")
         rename { "LICENSE.txt" }
     }
