@@ -53,7 +53,7 @@ spotless {
     }
 
     kotlinGradle {
-        target("*.gradle.kts", "problem4j-*/*.kts", "buildSrc/*.kts", "buildSrc/src/**/*.kts")
+        target("*.gradle.kts", "buildSrc/*.kts", "buildSrc/src/**/*.kts")
 
         ktlint("1.8.0").editorConfigOverride(mapOf("max_line_length" to "120"))
         endWithNewline()
