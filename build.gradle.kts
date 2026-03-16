@@ -12,7 +12,7 @@ group = "io.github.malczuuu"
 dependencies {
     api("jakarta.validation:jakarta.validation-api:3.1.1")
 
-    testImplementation(platform("org.junit:junit-bom:5.14.2"))
+    testImplementation(platform("org.junit:junit-bom:5.14.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
