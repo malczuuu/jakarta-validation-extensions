@@ -6,17 +6,21 @@ plugins {
 }
 
 java {
-    toolchain.languageVersion = providers.gradleProperty("internal.java.version").map { JavaLanguageVersion.of(it) }
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
     withSourcesJar()
     withJavadocJar()
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-parameters")
+    options.encoding = "UTF-8"
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    options.release = 11
 }
 
 tasks.withType<Jar>().configureEach {
-    dependsOn("cleanLibs")
     manifest {
         attributes(
             "Implementation-Title" to project.name,
