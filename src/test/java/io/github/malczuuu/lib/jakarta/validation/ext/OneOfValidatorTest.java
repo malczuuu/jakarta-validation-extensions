@@ -581,4 +581,109 @@ class OneOfValidatorTest {
 
     assertTrue(violations.isEmpty());
   }
+
+  private static class EnumTypeStringBean {
+
+    @OneOf(enumType = TestEnum.class)
+    private final String value;
+
+    private EnumTypeStringBean(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+  }
+
+  @Test
+  void givenEnumTypeAndValidConstantName_whenValidating_thenNoViolation() {
+    EnumTypeStringBean bean = new EnumTypeStringBean("A");
+
+    Set<ConstraintViolation<EnumTypeStringBean>> violations = validator.validate(bean);
+
+    assertTrue(violations.isEmpty());
+  }
+
+  @Test
+  void givenEnumTypeAndInvalidConstantName_whenValidating_thenViolation() {
+    EnumTypeStringBean bean = new EnumTypeStringBean("D");
+
+    Set<ConstraintViolation<EnumTypeStringBean>> violations = validator.validate(bean);
+
+    assertEquals(1, violations.size());
+  }
+
+  @Test
+  void givenEnumTypeAndNullValue_whenValidating_thenNoViolation() {
+    EnumTypeStringBean bean = new EnumTypeStringBean(null);
+
+    Set<ConstraintViolation<EnumTypeStringBean>> violations = validator.validate(bean);
+
+    assertTrue(violations.isEmpty());
+  }
+
+  private static class EnumTypeIgnoreCaseStringBean {
+
+    @OneOf(enumType = TestEnum.class, ignoreCase = true)
+    private final String value;
+
+    private EnumTypeIgnoreCaseStringBean(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+  }
+
+  @Test
+  void givenEnumTypeIgnoreCaseAndLowercaseConstantName_whenValidating_thenNoViolation() {
+    EnumTypeIgnoreCaseStringBean bean = new EnumTypeIgnoreCaseStringBean("a");
+
+    Set<ConstraintViolation<EnumTypeIgnoreCaseStringBean>> violations = validator.validate(bean);
+
+    assertTrue(violations.isEmpty());
+  }
+
+  @Test
+  void givenEnumTypeIgnoreCaseAndInvalidName_whenValidating_thenViolation() {
+    EnumTypeIgnoreCaseStringBean bean = new EnumTypeIgnoreCaseStringBean("d");
+
+    Set<ConstraintViolation<EnumTypeIgnoreCaseStringBean>> violations = validator.validate(bean);
+
+    assertEquals(1, violations.size());
+  }
+
+  private static class ValuesOverEnumTypeBean {
+
+    @OneOf(values = {"1", "2"}, enumType = TestEnum.class)
+    private final String value;
+
+    private ValuesOverEnumTypeBean(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+  }
+
+  @Test
+  void givenValuesAndEnumType_whenValidatingValueFromValues_thenNoViolation() {
+    ValuesOverEnumTypeBean bean = new ValuesOverEnumTypeBean("1");
+
+    Set<ConstraintViolation<ValuesOverEnumTypeBean>> violations = validator.validate(bean);
+
+    assertTrue(violations.isEmpty());
+  }
+
+  @Test
+  void givenValuesAndEnumType_whenValidatingEnumConstantNotInValues_thenViolation() {
+    ValuesOverEnumTypeBean bean = new ValuesOverEnumTypeBean("A");
+
+    Set<ConstraintViolation<ValuesOverEnumTypeBean>> violations = validator.validate(bean);
+
+    assertEquals(1, violations.size());
+  }
 }

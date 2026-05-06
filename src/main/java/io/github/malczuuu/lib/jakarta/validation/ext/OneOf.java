@@ -56,10 +56,19 @@ public @interface OneOf {
 
   Class<? extends Payload>[] payload() default {};
 
-  /** Returns: allowed values for the annotated element */
-  String[] values();
+  /**
+   * @return allowed values for the annotated element
+   */
+  String[] values() default {};
 
-  /** Returns: whether to ignore case when validating {@code String} or {@code Enum} values. */
+  /**
+   * @return the {@code Enum} class to use for validating the annotated element
+   */
+  Class<?> enumType() default Void.class;
+
+  /**
+   * @return whether to ignore case when validating {@code String} or {@code Enum} values.
+   */
   boolean ignoreCase() default false;
 
   /**

@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toSet;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 
@@ -40,7 +41,16 @@ public class OneOfValidator implements ConstraintValidator<OneOf, Object> {
    */
   @Override
   public void initialize(OneOf constraintAnnotation) {
-    values = Set.of(constraintAnnotation.values());
+    if (constraintAnnotation.values().length > 0) {
+      values = Set.of(constraintAnnotation.values());
+    } else if (constraintAnnotation.enumType().isEnum()) {
+      values =
+          Arrays.stream(constraintAnnotation.enumType().getEnumConstants())
+              .map(c -> ((Enum<?>) c).name())
+              .collect(toSet());
+    } else {
+      values = Set.of();
+    }
     valuesIgnoreCase = values.stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(toSet());
     ignoreCase = constraintAnnotation.ignoreCase();
   }

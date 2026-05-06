@@ -55,8 +55,8 @@ public @interface Alphanumeric {
   Class<? extends Payload>[] payload() default {};
 
   /**
-   * Returns: characters to ignore during validation, declared as {@link String} instead of {@code
-   * char[]} for simplicity.
+   * @return characters to ignore during validation, declared as {@link String} instead of {@code
+   *     char[]} for simplicity.
    */
   String ignoreChars() default "";
 
