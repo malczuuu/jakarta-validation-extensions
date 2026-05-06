@@ -3,14 +3,14 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "quarterly"
+      interval: "monthly"
     target-branch: main
     open-pull-requests-limit: 10
 
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "quarterly"
+      interval: "monthly"
     target-branch: main
     open-pull-requests-limit: 10
     allow:
