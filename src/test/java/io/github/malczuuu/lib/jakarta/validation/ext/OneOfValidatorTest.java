@@ -1,17 +1,27 @@
 /*
- * Copyright (c) 2025 Damian Malczewski
+ * MIT License
+ *
+ * Copyright (c) 2025-2026 Damian Malczewski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, subject to the following conditions:
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * SPDX-License-Identifier: MIT
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
+
 package io.github.malczuuu.lib.jakarta.validation.ext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -657,7 +667,9 @@ class OneOfValidatorTest {
 
   private static class ValuesOverEnumTypeBean {
 
-    @OneOf(values = {"1", "2"}, enumType = TestEnum.class)
+    @OneOf(
+        values = {"1", "2"},
+        enumType = TestEnum.class)
     private final String value;
 
     private ValuesOverEnumTypeBean(String value) {
@@ -685,5 +697,37 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<ValuesOverEnumTypeBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+  }
+
+  private static class NonEnumTypeBean {
+
+    @OneOf(enumType = String.class)
+    private final String value;
+
+    private NonEnumTypeBean(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+  }
+
+  @Test
+  void givenNonEnumEnumType_whenValidating_thenNoExceptionThrown() {
+    NonEnumTypeBean bean = new NonEnumTypeBean("anything");
+
+    Set<ConstraintViolation<NonEnumTypeBean>> violations = validator.validate(bean);
+
+    assertEquals(1, violations.size());
+  }
+
+  @Test
+  void givenNonEnumEnumTypeAndNullValue_whenValidating_thenNoViolation() {
+    NonEnumTypeBean bean = new NonEnumTypeBean(null);
+
+    Set<ConstraintViolation<NonEnumTypeBean>> violations = validator.validate(bean);
+
+    assertTrue(violations.isEmpty());
   }
 }
