@@ -7,15 +7,15 @@ plugins {
 
 version = "current"
 
-// Kotlin does not yet support 25 JDK target, to be revisited in the future.
-if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_25)) {
-    kotlin {
-        jvmToolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
-    }
+repositories {
+    gradlePluginPortal()
+    mavenCentral()
 }
 
-repositories {
-    mavenCentral()
+dependencies {
+    implementation(plugin(libs.plugins.idea.ext))
+}
+
+fun plugin(plugin: Provider<PluginDependency>): Provider<String> = plugin.map {
+    "${it.pluginId}:${it.pluginId}.gradle.plugin:${it.version}"
 }

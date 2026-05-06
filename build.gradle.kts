@@ -1,22 +1,24 @@
 import com.diffplug.spotless.LineEnding
 
 plugins {
-    id("internal.convention-java-library")
-    id("internal.convention-publishing")
-    id("com.diffplug.spotless").version("8.0.0")
-    id("com.gradleup.nmcp").version("1.3.0")
+    id("internal.idea-convention")
+    id("internal.jacoco-convention")
+    id("internal.java-library-convention")
+    id("internal.publishing-convention")
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.nmcp)
 }
 
 group = "io.github.malczuuu"
 
 dependencies {
-    api("jakarta.validation:jakarta.validation-api:3.1.1")
+    api(libs.jakarta.validation.api)
 
-    testImplementation(platform("org.junit:junit-bom:5.14.3"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
-    testImplementation("org.hibernate.validator:hibernate-validator:8.0.3.Final")
+    testImplementation(libs.hibernate.validator)
 }
 
 internalPublishing {
