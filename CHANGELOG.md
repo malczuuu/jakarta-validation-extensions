@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-07
+
 ### Added
 
 - Add `enumType` to `@OneOf` annotation to allow users to specify an `enum` class instead of listing all values.
