@@ -35,6 +35,19 @@ higher is required to use this library.
   for `String` in particular, but also `StringBuilder` etc.), `Number`, `Enum` and `Character`.
 - **`@Alphanumeric`** - validates that a value contains only alphanumeric characters (`a-z`, `A-Z`, `0-9`), with
   optional characters to ignore. Supported types include `CharSequence`, and `Character`.
+- **`@Hex`** - validates that a `CharSequence` contains only hexadecimal characters (`0–9`, `a–f`, `A–F`).
+- **`@SemVer`** - validates that a `CharSequence` is a valid semantic version string per the
+  [semver.org](https://semver.org/) specification.
+- **`@CountryCode`** - validates that a `CharSequence` is a recognized ISO 3166-1 alpha-2 country code, with an
+  optional `ignoreCase` attribute.
+- **`@LanguageTag`** - validates that a `CharSequence` is a syntactically valid BCP 47 language tag.
+- **`@IsoDate`** - validates that a `CharSequence` is a valid ISO 8601 date (e.g. `2024-01-15`).
+- **`@IsoTime`** - validates that a `CharSequence` is a valid ISO 8601 time (e.g. `10:30:00`), with an optional
+  `offsetRequired` attribute to mandate a timezone offset.
+- **`@IsoDateTime`** - validates that a `CharSequence` is a valid ISO 8601 date-time (e.g. `2024-01-15T10:30:00`),
+  with an optional `offsetRequired` attribute to mandate a timezone offset.
+
+Messages are English only. No localization support is provided.
 
 ## Versioning
 
