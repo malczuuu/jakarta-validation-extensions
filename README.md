@@ -59,8 +59,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 <summary><b>Expand...</b></summary>
 
 Gradle **9.x+** requires **Java 17+** to run, but higher Java versions can also be used. All modules of this project are
-compiled using a **Java 11 toolchain**, so the produced artifacts are compatible with **Java 11**, regardless of the
-Java version Gradle runs on.
+compiled using a **Java 25 toolchain** with `--release 11` option, so the produced artifacts are compatible with
+**Java 11**, regardless of the Java version Gradle runs on.
 
 ```bash
 ./gradlew build
@@ -79,11 +79,10 @@ task. **Note** that **building will fail** if code is not properly formatted.
 ./gradlew spotlessApply
 ```
 
-To publish the built artifacts to local Maven repository, run following command, replacing `XXXX` with the desired
-version. By default, the version is derived from git commit hash.
+To publish the built artifacts to local Maven repository, run following command.
 
 ```bash
-./gradlew -Pversion=XXXX publishToMavenLocal
+./gradlew publishToMavenLocal
 ```
 
 </details>
