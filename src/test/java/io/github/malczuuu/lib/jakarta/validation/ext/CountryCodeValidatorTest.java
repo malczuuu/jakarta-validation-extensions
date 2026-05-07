@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class AlphanumericValidatorTest {
+class CountryCodeValidatorTest {
 
   private Validator validator;
 
@@ -48,7 +48,7 @@ class AlphanumericValidatorTest {
 
   private static final class StringBean {
 
-    @Alphanumeric private final @Nullable String value;
+    @CountryCode private final @Nullable String value;
 
     private StringBean(@Nullable String value) {
       this.value = value;
@@ -60,8 +60,8 @@ class AlphanumericValidatorTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"abc123", "ABC123"})
-  void givenValidString_whenValidating_thenNoViolation(String value) {
+  @ValueSource(strings = {"US", "PL", "DE", "FR", "GB", "JP"})
+  void givenValidCountryCode_whenValidating_thenNoViolation(String value) {
     StringBean bean = new StringBean(value);
 
     Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
@@ -70,18 +70,18 @@ class AlphanumericValidatorTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"abc-123!", "ABC-123!"})
-  void givenInvalidString_whenValidating_thenViolation(String value) {
+  @ValueSource(strings = {"us", "XX", "USA", "ZZ", "123"})
+  void givenInvalidCountryCode_whenValidating_thenViolation(String value) {
     StringBean bean = new StringBean(value);
 
     Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
+    assertEquals("must be a valid country code", violations.iterator().next().getMessage());
   }
 
   @Test
-  void givenNullString_whenValidating_thenNoViolation() {
+  void givenNullValue_whenValidating_thenNoViolation() {
     StringBean bean = new StringBean(null);
 
     Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
@@ -89,12 +89,14 @@ class AlphanumericValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static final class StringBeanWithIgnore {
+  // ----- ignoreCase -----
 
-    @Alphanumeric(ignoreChars = "-_ ")
+  private static final class IgnoreCaseBean {
+
+    @CountryCode(ignoreCase = true)
     private final String value;
 
-    private StringBeanWithIgnore(String value) {
+    private IgnoreCaseBean(String value) {
       this.value = value;
     }
 
@@ -103,72 +105,33 @@ class AlphanumericValidatorTest {
     }
   }
 
-  @Test
-  void givenStringWithIgnoredChars_whenValidating_thenNoViolation() {
-    StringBeanWithIgnore bean = new StringBeanWithIgnore("abc-123_ ");
+  @ParameterizedTest
+  @ValueSource(strings = {"us", "pl", "de", "US", "PL", "DE"})
+  void givenIgnoreCase_whenValidating_thenAcceptsBothCases(String value) {
+    IgnoreCaseBean bean = new IgnoreCaseBean(value);
 
-    Set<ConstraintViolation<StringBeanWithIgnore>> violations = validator.validate(bean);
+    Set<ConstraintViolation<IgnoreCaseBean>> violations = validator.validate(bean);
 
     assertTrue(violations.isEmpty());
   }
 
-  @Test
-  void givenStringWithNonIgnoredInvalidChars_whenValidating_thenViolation() {
-    StringBeanWithIgnore bean = new StringBeanWithIgnore("abc-123!");
+  @ParameterizedTest
+  @ValueSource(strings = {"xx", "XX", "ZZ"})
+  void givenIgnoreCaseWithUnrecognizedCode_whenValidating_thenViolation(String value) {
+    IgnoreCaseBean bean = new IgnoreCaseBean(value);
 
-    Set<ConstraintViolation<StringBeanWithIgnore>> violations = validator.validate(bean);
+    Set<ConstraintViolation<IgnoreCaseBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
+    assertEquals("must be a valid country code", violations.iterator().next().getMessage());
   }
 
-  private static final class CharBean {
-
-    @Alphanumeric private final @Nullable Character value;
-
-    private CharBean(@Nullable Character value) {
-      this.value = value;
-    }
-
-    public @Nullable Character getValue() {
-      return value;
-    }
-  }
-
-  @Test
-  void givenValidCharacter_whenValidating_thenNoViolation() {
-    CharBean bean = new CharBean('a');
-
-    Set<ConstraintViolation<CharBean>> violations = validator.validate(bean);
-
-    assertTrue(violations.isEmpty());
-  }
-
-  @Test
-  void givenInvalidCharacter_whenValidating_thenViolation() {
-    CharBean bean = new CharBean('#');
-
-    Set<ConstraintViolation<CharBean>> violations = validator.validate(bean);
-
-    assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
-  }
-
-  @Test
-  void givenNullCharacter_whenValidating_thenNoViolation() {
-    CharBean bean = new CharBean(null);
-
-    Set<ConstraintViolation<CharBean>> violations = validator.validate(bean);
-
-    assertTrue(violations.isEmpty());
-  }
-
-  // ------------------ Repeatable annotations ------------------
+  // ----- Repeatable annotations -----
 
   private static final class RepeatableBean {
 
-    @Alphanumeric
-    @Alphanumeric(ignoreChars = "-_")
+    @CountryCode
+    @CountryCode(message = "country code is invalid")
     private final String value;
 
     private RepeatableBean(String value) {
@@ -182,21 +145,22 @@ class AlphanumericValidatorTest {
 
   @Test
   void givenRepeatableAnnotations_whenValidating_thenBothEnforced() {
-    RepeatableBean bean = new RepeatableBean("abc-123");
+    RepeatableBean validBean = new RepeatableBean("US");
+    assertTrue(validator.validate(validBean).isEmpty());
 
-    Set<ConstraintViolation<RepeatableBean>> violations = validator.validate(bean);
-    assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
-
-    RepeatableBean bean2 = new RepeatableBean("abc-123!");
-    violations = validator.validate(bean2);
+    RepeatableBean invalidBean = new RepeatableBean("XX");
+    Set<ConstraintViolation<RepeatableBean>> violations = validator.validate(invalidBean);
     assertEquals(2, violations.size());
-    assertTrue(violations.stream().allMatch(v -> "must be alphanumeric".equals(v.getMessage())));
+    assertTrue(
+        violations.stream().anyMatch(v -> "must be a valid country code".equals(v.getMessage())));
+    assertTrue(violations.stream().anyMatch(v -> "country code is invalid".equals(v.getMessage())));
   }
+
+  // ----- Unsupported type -----
 
   private static final class UnsupportedBean {
 
-    @Alphanumeric private final Object value;
+    @CountryCode private final Object value;
 
     private UnsupportedBean(Object value) {
       this.value = value;
@@ -216,49 +180,39 @@ class AlphanumericValidatorTest {
     assertNotNull(e.getMessage());
     assertTrue(e.getMessage().contains("Unexpected exception during isValid call"));
     assertInstanceOf(IllegalArgumentException.class, e.getCause());
-    assertEquals("Alphanumeric not supported for java.lang.Object type", e.getCause().getMessage());
+    assertEquals("CountryCode not supported for java.lang.Object type", e.getCause().getMessage());
   }
 
-  private static final class EmptyStringBean {
-
-    @Alphanumeric private final String value;
-
-    private EmptyStringBean(String value) {
-      this.value = value;
-    }
-
-    public String getValue() {
-      return value;
-    }
-  }
+  // ----- Message -----
 
   @Test
-  void givenEmptyString_whenValidating_thenNoViolation() {
-    EmptyStringBean bean = new EmptyStringBean("");
+  void givenInvalidCountryCode_whenValidating_thenDefaultMessage() {
+    StringBean bean = new StringBean("XX");
 
-    Set<ConstraintViolation<EmptyStringBean>> violations = validator.validate(bean);
+    Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
 
-    assertTrue(violations.isEmpty());
+    assertEquals(1, violations.size());
+    assertEquals("must be a valid country code", violations.iterator().next().getMessage());
   }
 
   // ----- List -----
 
   private static final class ListBean {
 
-    private final @Nullable List<@Alphanumeric String> values;
+    private final @Nullable List<@CountryCode String> values;
 
-    private ListBean(@Nullable List<@Alphanumeric String> values) {
+    private ListBean(@Nullable List<@CountryCode String> values) {
       this.values = values;
     }
 
-    public @Nullable List<@Alphanumeric String> getValues() {
+    public @Nullable List<@CountryCode String> getValues() {
       return values;
     }
   }
 
   @Test
   void givenListWithAllValidElements_whenValidating_thenNoViolation() {
-    ListBean bean = new ListBean(List.of("abc", "123", "ABC123"));
+    ListBean bean = new ListBean(List.of("US", "PL", "DE"));
 
     Set<ConstraintViolation<ListBean>> violations = validator.validate(bean);
 
@@ -267,12 +221,12 @@ class AlphanumericValidatorTest {
 
   @Test
   void givenListWithInvalidElement_whenValidating_thenViolation() {
-    ListBean bean = new ListBean(List.of("valid", "abc-123!"));
+    ListBean bean = new ListBean(List.of("US", "XX"));
 
     Set<ConstraintViolation<ListBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
+    assertEquals("must be a valid country code", violations.iterator().next().getMessage());
   }
 
   @Test

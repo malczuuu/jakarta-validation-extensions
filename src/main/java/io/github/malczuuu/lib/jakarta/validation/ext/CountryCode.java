@@ -32,15 +32,32 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for validating that a value is one of a specified set of allowed values.
+ * Annotation for validating that a {@code CharSequence} value is a recognized ISO 3166-1 alpha-2
+ * country code (e.g. {@code US}, {@code PL}, {@code DE}).
+ *
+ * <p>The recognized codes are sourced from the JDK via {@link java.util.Locale#getISOCountries()}.
+ * By default, matching is case-sensitive and codes must be in canonical uppercase form.
+ *
+ * <p>Accepted values include:
+ *
+ * <ul>
+ *   <li>{@code US} - United States
+ *   <li>{@code PL} - Poland
+ *   <li>{@code DE} - Germany
+ * </ul>
+ *
+ * <p>Rejected values include:
+ *
+ * <ul>
+ *   <li>{@code us} - lowercase (unless {@link #ignoreCase} is {@code true})
+ *   <li>{@code XX} - not a recognized country code
+ *   <li>{@code USA} - three-letter code, not alpha-2
+ * </ul>
  *
  * <p>Supported types are:
  *
  * <ul>
  *   <li>{@code CharSequence} ({@code String} in particular, but also {@code StringBuilder} etc.)
- *   <li>{@code Enum}
- *   <li>{@code Number} (compared to {@code values} with {@code Number::toString})
- *   <li>{@code Character}
  * </ul>
  *
  * <p>{@code null} elements are considered valid.
@@ -48,46 +65,38 @@ import java.lang.annotation.Target;
  * <p>Example usages:
  *
  * <pre>
- * // Restrict a String to a fixed set of values
- * &#064;OneOf(values = {"PENDING", "ACTIVE", "INACTIVE"})
- * private String status;
+ * // Strict uppercase matching
+ * &#064;CountryCode
+ * private String country;
  *
- * // Case-insensitive matching
- * &#064;OneOf(values = {"asc", "desc"}, ignoreCase = true)
- * private String sortOrder;
- *
- * // Derive allowed values from all constants of an enum
- * &#064;OneOf(enumType = Status.class)
- * private String status;
- *
- * // Validate an enum field against a subset of its constants
- * &#064;OneOf(values = {"PENDING", "ACTIVE"})
- * private Status status;
+ * // Accept lowercase codes as well
+ * &#064;CountryCode(ignoreCase = true)
+ * private String country;
  * </pre>
  *
- * @since 1.0.0
+ * @since 1.2.0
  */
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
-@Repeatable(OneOf.List.class)
+@Repeatable(CountryCode.List.class)
 @Documented
-@Constraint(validatedBy = OneOfValidator.class)
-public @interface OneOf {
+@Constraint(validatedBy = CountryCodeValidator.class)
+public @interface CountryCode {
 
   /**
    * Returns the error message template.
    *
    * @return the error message template, which can be a literal message or a message key in a
    *     resource bundle
-   * @since 1.0.0
+   * @since 1.2.0
    */
-  String message() default "must be one of {values}";
+  String message() default "must be a valid country code";
 
   /**
    * Returns the validation groups to which this constraint belongs.
    *
    * @return the validation groups to which this constraint belongs
-   * @since 1.0.0
+   * @since 1.2.0
    */
   Class<?>[] groups() default {};
 
@@ -95,39 +104,24 @@ public @interface OneOf {
    * Returns the payload with which the constraint violation can be associated.
    *
    * @return the payload with which the constraint violation can be associated
-   * @since 1.0.0
+   * @since 1.2.0
    */
   Class<? extends Payload>[] payload() default {};
 
   /**
-   * Returns the allowed values for the annotated element.
+   * Returns whether to ignore case when matching the country code.
    *
-   * @return allowed values for the annotated element
-   * @since 1.0.0
-   */
-  String[] values() default {};
-
-  /**
-   * Returns the enum class to use for deriving the allowed values.
-   *
-   * @return the {@code Enum} class to use for validating the annotated element
-   * @since 1.0.0
-   */
-  Class<?> enumType() default Void.class;
-
-  /**
-   * Returns whether to ignore case when validating {@code String} or {@code Enum} values.
-   *
-   * @return whether to ignore case when validating {@code String} or {@code Enum} values.
-   * @since 1.0.0
+   * @return whether to ignore case when matching the country code, {@code false} requires canonical
+   *     uppercase (e.g. {@code US})
+   * @since 1.2.0
    */
   boolean ignoreCase() default false;
 
   /**
-   * Defines several {@link OneOf} annotations on the same element.
+   * Defines several {@link CountryCode} annotations on the same element.
    *
-   * @see OneOf
-   * @since 1.0.0
+   * @see CountryCode
+   * @since 1.2.0
    */
   @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
   @Retention(RUNTIME)
@@ -135,11 +129,11 @@ public @interface OneOf {
   @interface List {
 
     /**
-     * Returns the contained {@link OneOf} annotations.
+     * Returns the contained {@link CountryCode} annotations.
      *
-     * @return array of {@link OneOf} annotations
-     * @since 1.0.0
+     * @return array of {@link CountryCode} annotations
+     * @since 1.2.0
      */
-    OneOf[] value();
+    CountryCode[] value();
   }
 }

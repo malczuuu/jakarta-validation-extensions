@@ -1,25 +1,17 @@
 /*
- * MIT License
+ * Copyright 2025-2026 Damian Malczewski
  *
- * Copyright (c) 2025-2026 Damian Malczewski
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.github.malczuuu.lib.jakarta.validation.ext;
@@ -29,11 +21,14 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Validator for the {@link Alphanumeric} annotation.
  *
  * <p>Checks if the value of the annotated element is alphanumeric.
+ *
+ * @since 1.1.0
  */
 public class AlphanumericValidator implements ConstraintValidator<Alphanumeric, Object> {
 
@@ -45,13 +40,15 @@ public class AlphanumericValidator implements ConstraintValidator<Alphanumeric, 
    * Initializes the validator by compiling {@link Pattern} object for alphanumeric strings.
    *
    * @param constraintAnnotation the annotation instance for a given constraint declaration
+   * @since 1.1.0
    */
   @Override
   public void initialize(Alphanumeric constraintAnnotation) {
     if (!constraintAnnotation.ignoreChars().isEmpty()) {
       ignoredChars = new HashSet<>();
-      for (char ch : constraintAnnotation.ignoreChars().toCharArray()) {
-        ignoredChars.add(ch);
+      String ignoreChars = constraintAnnotation.ignoreChars();
+      for (int i = 0; i < ignoreChars.length(); i++) {
+        ignoredChars.add(ignoreChars.charAt(i));
       }
     }
   }
@@ -70,9 +67,10 @@ public class AlphanumericValidator implements ConstraintValidator<Alphanumeric, 
    * @param context the context in which the constraint is evaluated
    * @return {@code true} if the value is valid, {@code false} otherwise
    * @throws IllegalArgumentException if the value type is not supported
+   * @since 1.1.0
    */
   @Override
-  public boolean isValid(Object value, ConstraintValidatorContext context)
+  public boolean isValid(@Nullable Object value, ConstraintValidatorContext context)
       throws IllegalArgumentException {
     if (value == null) {
       return true;
@@ -119,7 +117,8 @@ public class AlphanumericValidator implements ConstraintValidator<Alphanumeric, 
   private String removeIgnoredChars(String valueAsString) {
     if (!ignoredChars.isEmpty()) {
       StringBuilder builder = new StringBuilder();
-      for (char ch : valueAsString.toCharArray()) {
+      for (int i = 0; i < valueAsString.length(); i++) {
+        char ch = valueAsString.charAt(i);
         if (!ignoredChars.contains(ch)) {
           builder.append(ch);
         }

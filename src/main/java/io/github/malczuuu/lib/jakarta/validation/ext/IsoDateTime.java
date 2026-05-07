@@ -32,15 +32,31 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for validating that a value is one of a specified set of allowed values.
+ * Annotation for validating that a {@code CharSequence} value is a valid ISO 8601 date-time string.
+ *
+ * <p>The value must contain at least a date and a time part separated by {@code T}. A timezone
+ * offset is accepted but optional unless {@link #offsetRequired} is set to {@code true}.
+ *
+ * <p>Accepted values include:
+ *
+ * <ul>
+ *   <li>{@code 2024-01-15T10:30:00} - local date-time, no offset
+ *   <li>{@code 2024-01-15T10:30:00Z} - UTC
+ *   <li>{@code 2024-01-15T10:30:00+05:30} - with timezone offset
+ *   <li>{@code 2024-01-15T10:30:00.123Z} - with fractional seconds
+ * </ul>
+ *
+ * <p>Rejected values include:
+ *
+ * <ul>
+ *   <li>{@code 2024-01-15} - date only, missing time component
+ *   <li>{@code 2024-01-15 10:30:00} - space instead of {@code T}
+ * </ul>
  *
  * <p>Supported types are:
  *
  * <ul>
  *   <li>{@code CharSequence} ({@code String} in particular, but also {@code StringBuilder} etc.)
- *   <li>{@code Enum}
- *   <li>{@code Number} (compared to {@code values} with {@code Number::toString})
- *   <li>{@code Character}
  * </ul>
  *
  * <p>{@code null} elements are considered valid.
@@ -48,46 +64,38 @@ import java.lang.annotation.Target;
  * <p>Example usages:
  *
  * <pre>
- * // Restrict a String to a fixed set of values
- * &#064;OneOf(values = {"PENDING", "ACTIVE", "INACTIVE"})
- * private String status;
+ * // Any ISO 8601 date-time, offset optional
+ * &#064;IsoDateTime
+ * private String createdAt;
  *
- * // Case-insensitive matching
- * &#064;OneOf(values = {"asc", "desc"}, ignoreCase = true)
- * private String sortOrder;
- *
- * // Derive allowed values from all constants of an enum
- * &#064;OneOf(enumType = Status.class)
- * private String status;
- *
- * // Validate an enum field against a subset of its constants
- * &#064;OneOf(values = {"PENDING", "ACTIVE"})
- * private Status status;
+ * // Require a timezone offset, e.g. "2024-01-15T10:30:00Z"
+ * &#064;IsoDateTime(offsetRequired = true)
+ * private String updatedAt;
  * </pre>
  *
- * @since 1.0.0
+ * @since 1.2.0
  */
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
-@Repeatable(OneOf.List.class)
+@Repeatable(IsoDateTime.List.class)
 @Documented
-@Constraint(validatedBy = OneOfValidator.class)
-public @interface OneOf {
+@Constraint(validatedBy = IsoDateTimeValidator.class)
+public @interface IsoDateTime {
 
   /**
    * Returns the error message template.
    *
    * @return the error message template, which can be a literal message or a message key in a
    *     resource bundle
-   * @since 1.0.0
+   * @since 1.2.0
    */
-  String message() default "must be one of {values}";
+  String message() default "must be a valid ISO 8601 date-time";
 
   /**
    * Returns the validation groups to which this constraint belongs.
    *
    * @return the validation groups to which this constraint belongs
-   * @since 1.0.0
+   * @since 1.2.0
    */
   Class<?>[] groups() default {};
 
@@ -95,39 +103,24 @@ public @interface OneOf {
    * Returns the payload with which the constraint violation can be associated.
    *
    * @return the payload with which the constraint violation can be associated
-   * @since 1.0.0
+   * @since 1.2.0
    */
   Class<? extends Payload>[] payload() default {};
 
   /**
-   * Returns the allowed values for the annotated element.
+   * Returns whether a timezone offset is required.
    *
-   * @return allowed values for the annotated element
-   * @since 1.0.0
+   * @return {@code true} if a timezone offset (e.g. {@code Z} or {@code +05:30}) is required,
+   *     {@code false} to allow date-times without an offset
+   * @since 1.2.0
    */
-  String[] values() default {};
+  boolean offsetRequired() default false;
 
   /**
-   * Returns the enum class to use for deriving the allowed values.
+   * Defines several {@link IsoDateTime} annotations on the same element.
    *
-   * @return the {@code Enum} class to use for validating the annotated element
-   * @since 1.0.0
-   */
-  Class<?> enumType() default Void.class;
-
-  /**
-   * Returns whether to ignore case when validating {@code String} or {@code Enum} values.
-   *
-   * @return whether to ignore case when validating {@code String} or {@code Enum} values.
-   * @since 1.0.0
-   */
-  boolean ignoreCase() default false;
-
-  /**
-   * Defines several {@link OneOf} annotations on the same element.
-   *
-   * @see OneOf
-   * @since 1.0.0
+   * @see IsoDateTime
+   * @since 1.2.0
    */
   @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
   @Retention(RUNTIME)
@@ -135,11 +128,11 @@ public @interface OneOf {
   @interface List {
 
     /**
-     * Returns the contained {@link OneOf} annotations.
+     * Returns the contained {@link IsoDateTime} annotations.
      *
-     * @return array of {@link OneOf} annotations
-     * @since 1.0.0
+     * @return array of {@link IsoDateTime} annotations
+     * @since 1.2.0
      */
-    OneOf[] value();
+    IsoDateTime[] value();
   }
 }

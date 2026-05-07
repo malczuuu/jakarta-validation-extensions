@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class AlphanumericValidatorTest {
+class SemVerValidatorTest {
 
   private Validator validator;
 
@@ -48,7 +48,7 @@ class AlphanumericValidatorTest {
 
   private static final class StringBean {
 
-    @Alphanumeric private final @Nullable String value;
+    @SemVer private final @Nullable String value;
 
     private StringBean(@Nullable String value) {
       this.value = value;
@@ -60,8 +60,17 @@ class AlphanumericValidatorTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"abc123", "ABC123"})
-  void givenValidString_whenValidating_thenNoViolation(String value) {
+  @ValueSource(
+      strings = {
+        "1.0.0",
+        "0.0.1",
+        "1.2.3",
+        "1.2.3-alpha.1",
+        "1.2.3+build.42",
+        "1.2.3-beta.1+build.42",
+        "10.20.30"
+      })
+  void givenValidSemVer_whenValidating_thenNoViolation(String value) {
     StringBean bean = new StringBean(value);
 
     Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
@@ -70,18 +79,19 @@ class AlphanumericValidatorTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"abc-123!", "ABC-123!"})
-  void givenInvalidString_whenValidating_thenViolation(String value) {
+  @ValueSource(strings = {"1.0", "v1.0.0", "01.0.0", "1.0.0.", "1.0.0-", "not-a-version", ""})
+  void givenInvalidSemVer_whenValidating_thenViolation(String value) {
     StringBean bean = new StringBean(value);
 
     Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
+    assertEquals(
+        "must be a valid semantic version string", violations.iterator().next().getMessage());
   }
 
   @Test
-  void givenNullString_whenValidating_thenNoViolation() {
+  void givenNullValue_whenValidating_thenNoViolation() {
     StringBean bean = new StringBean(null);
 
     Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
@@ -89,86 +99,12 @@ class AlphanumericValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static final class StringBeanWithIgnore {
-
-    @Alphanumeric(ignoreChars = "-_ ")
-    private final String value;
-
-    private StringBeanWithIgnore(String value) {
-      this.value = value;
-    }
-
-    public String getValue() {
-      return value;
-    }
-  }
-
-  @Test
-  void givenStringWithIgnoredChars_whenValidating_thenNoViolation() {
-    StringBeanWithIgnore bean = new StringBeanWithIgnore("abc-123_ ");
-
-    Set<ConstraintViolation<StringBeanWithIgnore>> violations = validator.validate(bean);
-
-    assertTrue(violations.isEmpty());
-  }
-
-  @Test
-  void givenStringWithNonIgnoredInvalidChars_whenValidating_thenViolation() {
-    StringBeanWithIgnore bean = new StringBeanWithIgnore("abc-123!");
-
-    Set<ConstraintViolation<StringBeanWithIgnore>> violations = validator.validate(bean);
-
-    assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
-  }
-
-  private static final class CharBean {
-
-    @Alphanumeric private final @Nullable Character value;
-
-    private CharBean(@Nullable Character value) {
-      this.value = value;
-    }
-
-    public @Nullable Character getValue() {
-      return value;
-    }
-  }
-
-  @Test
-  void givenValidCharacter_whenValidating_thenNoViolation() {
-    CharBean bean = new CharBean('a');
-
-    Set<ConstraintViolation<CharBean>> violations = validator.validate(bean);
-
-    assertTrue(violations.isEmpty());
-  }
-
-  @Test
-  void givenInvalidCharacter_whenValidating_thenViolation() {
-    CharBean bean = new CharBean('#');
-
-    Set<ConstraintViolation<CharBean>> violations = validator.validate(bean);
-
-    assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
-  }
-
-  @Test
-  void givenNullCharacter_whenValidating_thenNoViolation() {
-    CharBean bean = new CharBean(null);
-
-    Set<ConstraintViolation<CharBean>> violations = validator.validate(bean);
-
-    assertTrue(violations.isEmpty());
-  }
-
-  // ------------------ Repeatable annotations ------------------
+  // ----- Repeatable annotations -----
 
   private static final class RepeatableBean {
 
-    @Alphanumeric
-    @Alphanumeric(ignoreChars = "-_")
+    @SemVer
+    @SemVer(message = "semver is invalid")
     private final String value;
 
     private RepeatableBean(String value) {
@@ -182,21 +118,23 @@ class AlphanumericValidatorTest {
 
   @Test
   void givenRepeatableAnnotations_whenValidating_thenBothEnforced() {
-    RepeatableBean bean = new RepeatableBean("abc-123");
+    RepeatableBean validBean = new RepeatableBean("1.0.0");
+    assertTrue(validator.validate(validBean).isEmpty());
 
-    Set<ConstraintViolation<RepeatableBean>> violations = validator.validate(bean);
-    assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
-
-    RepeatableBean bean2 = new RepeatableBean("abc-123!");
-    violations = validator.validate(bean2);
+    RepeatableBean invalidBean = new RepeatableBean("1.0");
+    Set<ConstraintViolation<RepeatableBean>> violations = validator.validate(invalidBean);
     assertEquals(2, violations.size());
-    assertTrue(violations.stream().allMatch(v -> "must be alphanumeric".equals(v.getMessage())));
+    assertTrue(
+        violations.stream()
+            .anyMatch(v -> "must be a valid semantic version string".equals(v.getMessage())));
+    assertTrue(violations.stream().anyMatch(v -> "semver is invalid".equals(v.getMessage())));
   }
+
+  // ----- Unsupported type -----
 
   private static final class UnsupportedBean {
 
-    @Alphanumeric private final Object value;
+    @SemVer private final Object value;
 
     private UnsupportedBean(Object value) {
       this.value = value;
@@ -216,49 +154,40 @@ class AlphanumericValidatorTest {
     assertNotNull(e.getMessage());
     assertTrue(e.getMessage().contains("Unexpected exception during isValid call"));
     assertInstanceOf(IllegalArgumentException.class, e.getCause());
-    assertEquals("Alphanumeric not supported for java.lang.Object type", e.getCause().getMessage());
+    assertEquals("SemVer not supported for java.lang.Object type", e.getCause().getMessage());
   }
 
-  private static final class EmptyStringBean {
-
-    @Alphanumeric private final String value;
-
-    private EmptyStringBean(String value) {
-      this.value = value;
-    }
-
-    public String getValue() {
-      return value;
-    }
-  }
+  // ----- Message -----
 
   @Test
-  void givenEmptyString_whenValidating_thenNoViolation() {
-    EmptyStringBean bean = new EmptyStringBean("");
+  void givenInvalidSemVer_whenValidating_thenDefaultMessage() {
+    StringBean bean = new StringBean("1.0");
 
-    Set<ConstraintViolation<EmptyStringBean>> violations = validator.validate(bean);
+    Set<ConstraintViolation<StringBean>> violations = validator.validate(bean);
 
-    assertTrue(violations.isEmpty());
+    assertEquals(1, violations.size());
+    assertEquals(
+        "must be a valid semantic version string", violations.iterator().next().getMessage());
   }
 
   // ----- List -----
 
   private static final class ListBean {
 
-    private final @Nullable List<@Alphanumeric String> values;
+    private final @Nullable List<@SemVer String> values;
 
-    private ListBean(@Nullable List<@Alphanumeric String> values) {
+    private ListBean(@Nullable List<@SemVer String> values) {
       this.values = values;
     }
 
-    public @Nullable List<@Alphanumeric String> getValues() {
+    public @Nullable List<@SemVer String> getValues() {
       return values;
     }
   }
 
   @Test
   void givenListWithAllValidElements_whenValidating_thenNoViolation() {
-    ListBean bean = new ListBean(List.of("abc", "123", "ABC123"));
+    ListBean bean = new ListBean(List.of("1.0.0", "2.3.4-alpha.1"));
 
     Set<ConstraintViolation<ListBean>> violations = validator.validate(bean);
 
@@ -267,12 +196,13 @@ class AlphanumericValidatorTest {
 
   @Test
   void givenListWithInvalidElement_whenValidating_thenViolation() {
-    ListBean bean = new ListBean(List.of("valid", "abc-123!"));
+    ListBean bean = new ListBean(List.of("1.0.0", "1.0"));
 
     Set<ConstraintViolation<ListBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
-    assertEquals("must be alphanumeric", violations.iterator().next().getMessage());
+    assertEquals(
+        "must be a valid semantic version string", violations.iterator().next().getMessage());
   }
 
   @Test

@@ -1,31 +1,24 @@
 /*
- * MIT License
+ * Copyright 2025-2026 Damian Malczewski
  *
- * Copyright (c) 2025-2026 Damian Malczewski
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.github.malczuuu.lib.jakarta.validation.ext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,11 +27,9 @@ import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.jupiter.api.BeforeAll;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,41 +37,23 @@ class OneOfValidatorTest {
 
   private Validator validator;
 
-  /**
-   * Disables the INFO banner ("HV000001: Hibernate Validator ...") that Hibernate Validator logs
-   * when the {@link org.hibernate.validator.internal.util.Version} class is initialized.
-   *
-   * <p>Hibernate Validator uses {@link java.util.logging} (JUL) for this particular message, so we
-   * silence that specific logger before any {@code ValidatorFactory} is created.
-   *
-   * <p>This logging is irrelevant in unit tests.
-   */
-  @BeforeAll
-  static void beforeAll() {
-    Logger.getLogger("org.hibernate.validator").setLevel(Level.OFF);
-  }
-
   @BeforeEach
   void beforeEach() {
-    try (ValidatorFactory factory =
-        Validation.byDefaultProvider()
-            .configure()
-            .messageInterpolator(new ParameterMessageInterpolator())
-            .buildValidatorFactory()) {
+    try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
       validator = factory.getValidator();
     }
   }
 
-  private static class GetterBean {
+  private static final class GetterBean {
 
-    private final String value;
+    private final @Nullable String value;
 
-    private GetterBean(String value) {
+    private GetterBean(@Nullable String value) {
       this.value = value;
     }
 
     @OneOf(values = {"A", "B", "C"})
-    public String getValue() {
+    public @Nullable String getValue() {
       return value;
     }
   }
@@ -114,16 +87,16 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class FieldBean {
+  private static final class FieldBean {
 
     @OneOf(values = {"X", "Y", "Z"})
-    private final String value;
+    private final @Nullable String value;
 
-    private FieldBean(String value) {
+    private FieldBean(@Nullable String value) {
       this.value = value;
     }
 
-    public String getValue() {
+    public @Nullable String getValue() {
       return value;
     }
   }
@@ -157,18 +130,18 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class GetterBeanIgnoreCase {
+  private static final class GetterBeanIgnoreCase {
 
-    private final String value;
+    private final @Nullable String value;
 
-    private GetterBeanIgnoreCase(String value) {
+    private GetterBeanIgnoreCase(@Nullable String value) {
       this.value = value;
     }
 
     @OneOf(
         values = {"A", "B", "C"},
         ignoreCase = true)
-    public String getValue() {
+    public @Nullable String getValue() {
       return value;
     }
   }
@@ -202,7 +175,7 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class FieldBeanIgnoreCase {
+  private static final class FieldBeanIgnoreCase {
 
     @OneOf(
         values = {"X", "Y", "Z"},
@@ -245,16 +218,16 @@ class OneOfValidatorTest {
     X
   }
 
-  private static class EnumBean {
+  private static final class EnumBean {
 
     @OneOf(values = {"A", "B", "C"})
-    private final TestEnum value;
+    private final @Nullable TestEnum value;
 
-    private EnumBean(TestEnum value) {
+    private EnumBean(@Nullable TestEnum value) {
       this.value = value;
     }
 
-    public TestEnum getValue() {
+    public @Nullable TestEnum getValue() {
       return value;
     }
   }
@@ -275,6 +248,7 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<EnumBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of [A, B, C]", violations.iterator().next().getMessage());
   }
 
   @Test
@@ -286,18 +260,18 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class EnumBeanIgnoreCase {
+  private static final class EnumBeanIgnoreCase {
 
     @OneOf(
         values = {"A", "B", "C"},
         ignoreCase = true)
-    private final TestEnum value;
+    private final @Nullable TestEnum value;
 
-    private EnumBeanIgnoreCase(TestEnum value) {
+    private EnumBeanIgnoreCase(@Nullable TestEnum value) {
       this.value = value;
     }
 
-    public TestEnum getValue() {
+    public @Nullable TestEnum getValue() {
       return value;
     }
   }
@@ -318,6 +292,7 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<EnumBeanIgnoreCase>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of [A, B, C]", violations.iterator().next().getMessage());
   }
 
   @Test
@@ -329,7 +304,7 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class EnumCaseSensitiveBean {
+  private static final class EnumCaseSensitiveBean {
 
     @OneOf(values = {"a"})
     private final TestEnum value;
@@ -350,9 +325,10 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<EnumCaseSensitiveBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of [a]", violations.iterator().next().getMessage());
   }
 
-  private static class EnumCaseInsensitiveBean {
+  private static final class EnumCaseInsensitiveBean {
 
     @OneOf(
         values = {"a"},
@@ -377,16 +353,16 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class NumberBean {
+  private static final class NumberBean {
 
     @OneOf(values = {"42"})
-    private final Integer value;
+    private final @Nullable Integer value;
 
-    private NumberBean(Integer value) {
+    private NumberBean(@Nullable Integer value) {
       this.value = value;
     }
 
-    public Integer getValue() {
+    public @Nullable Integer getValue() {
       return value;
     }
   }
@@ -407,6 +383,7 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<NumberBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of [42]", violations.iterator().next().getMessage());
   }
 
   @Test
@@ -418,16 +395,16 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class CharBean {
+  private static final class CharBean {
 
     @OneOf(values = {"A"})
-    private final Character value;
+    private final @Nullable Character value;
 
-    private CharBean(Character value) {
+    private CharBean(@Nullable Character value) {
       this.value = value;
     }
 
-    public Character getValue() {
+    public @Nullable Character getValue() {
       return value;
     }
   }
@@ -448,6 +425,7 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<CharBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of [A]", violations.iterator().next().getMessage());
   }
 
   @Test
@@ -459,18 +437,18 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class CharBeanIgnoreCase {
+  private static final class CharBeanIgnoreCase {
 
     @OneOf(
         values = {"A"},
         ignoreCase = true)
-    private final Character value;
+    private final @Nullable Character value;
 
-    private CharBeanIgnoreCase(Character value) {
+    private CharBeanIgnoreCase(@Nullable Character value) {
       this.value = value;
     }
 
-    public Character getValue() {
+    public @Nullable Character getValue() {
       return value;
     }
   }
@@ -491,6 +469,7 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<CharBeanIgnoreCase>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of [A]", violations.iterator().next().getMessage());
   }
 
   @Test
@@ -502,7 +481,7 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class UnsupportedBean {
+  private static final class UnsupportedBean {
 
     @OneOf(values = {"A"})
     private final Object value;
@@ -522,22 +501,23 @@ class OneOfValidatorTest {
 
     ValidationException e = assertThrows(ValidationException.class, () -> validator.validate(bean));
 
+    assertNotNull(e.getMessage());
     assertTrue(e.getMessage().contains("Unexpected exception during isValid call"));
     assertInstanceOf(IllegalArgumentException.class, e.getCause());
     assertEquals("OneOf not supported for java.lang.Object type", e.getCause().getMessage());
   }
 
-  private static class RepeatableBean {
+  private static final class RepeatableBean {
 
     @OneOf(values = {"A", "B"})
     @OneOf(values = {"1", "2"})
-    private final String value;
+    private final @Nullable String value;
 
-    private RepeatableBean(String value) {
+    private RepeatableBean(@Nullable String value) {
       this.value = value;
     }
 
-    public String getValue() {
+    public @Nullable String getValue() {
       return value;
     }
   }
@@ -549,6 +529,8 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<RepeatableBean>> violations = validator.validate(bean);
 
     assertEquals(2, violations.size());
+    assertTrue(violations.stream().anyMatch(v -> "must be one of [A, B]".equals(v.getMessage())));
+    assertTrue(violations.stream().anyMatch(v -> "must be one of [1, 2]".equals(v.getMessage())));
   }
 
   @Test
@@ -560,16 +542,16 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class EmptyValuesBean {
+  private static final class EmptyValuesBean {
 
     @OneOf(values = {})
-    private final String value;
+    private final @Nullable String value;
 
-    private EmptyValuesBean(String value) {
+    private EmptyValuesBean(@Nullable String value) {
       this.value = value;
     }
 
-    public String getValue() {
+    public @Nullable String getValue() {
       return value;
     }
   }
@@ -581,6 +563,7 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<EmptyValuesBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of []", violations.iterator().next().getMessage());
   }
 
   @Test
@@ -592,16 +575,16 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class EnumTypeStringBean {
+  private static final class EnumTypeStringBean {
 
     @OneOf(enumType = TestEnum.class)
-    private final String value;
+    private final @Nullable String value;
 
-    private EnumTypeStringBean(String value) {
+    private EnumTypeStringBean(@Nullable String value) {
       this.value = value;
     }
 
-    public String getValue() {
+    public @Nullable String getValue() {
       return value;
     }
   }
@@ -622,6 +605,7 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<EnumTypeStringBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of []", violations.iterator().next().getMessage());
   }
 
   @Test
@@ -633,7 +617,7 @@ class OneOfValidatorTest {
     assertTrue(violations.isEmpty());
   }
 
-  private static class EnumTypeIgnoreCaseStringBean {
+  private static final class EnumTypeIgnoreCaseStringBean {
 
     @OneOf(enumType = TestEnum.class, ignoreCase = true)
     private final String value;
@@ -663,9 +647,10 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<EnumTypeIgnoreCaseStringBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of []", violations.iterator().next().getMessage());
   }
 
-  private static class ValuesOverEnumTypeBean {
+  private static final class ValuesOverEnumTypeBean {
 
     @OneOf(
         values = {"1", "2"},
@@ -697,18 +682,19 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<ValuesOverEnumTypeBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of [1, 2]", violations.iterator().next().getMessage());
   }
 
-  private static class NonEnumTypeBean {
+  private static final class NonEnumTypeBean {
 
     @OneOf(enumType = String.class)
-    private final String value;
+    private final @Nullable String value;
 
-    private NonEnumTypeBean(String value) {
+    private NonEnumTypeBean(@Nullable String value) {
       this.value = value;
     }
 
-    public String getValue() {
+    public @Nullable String getValue() {
       return value;
     }
   }
@@ -720,6 +706,7 @@ class OneOfValidatorTest {
     Set<ConstraintViolation<NonEnumTypeBean>> violations = validator.validate(bean);
 
     assertEquals(1, violations.size());
+    assertEquals("must be one of []", violations.iterator().next().getMessage());
   }
 
   @Test
@@ -727,6 +714,49 @@ class OneOfValidatorTest {
     NonEnumTypeBean bean = new NonEnumTypeBean(null);
 
     Set<ConstraintViolation<NonEnumTypeBean>> violations = validator.validate(bean);
+
+    assertTrue(violations.isEmpty());
+  }
+
+  // ----- List -----
+
+  private static final class ListBean {
+
+    private final @Nullable List<@OneOf(values = {"A", "B", "C"}) String> values;
+
+    private ListBean(@Nullable List<@OneOf(values = {"A", "B", "C"}) String> values) {
+      this.values = values;
+    }
+
+    public @Nullable List<@OneOf(values = {"A", "B", "C"}) String> getValues() {
+      return values;
+    }
+  }
+
+  @Test
+  void givenListWithAllValidElements_whenValidating_thenNoViolation() {
+    ListBean bean = new ListBean(List.of("A", "B", "C"));
+
+    Set<ConstraintViolation<ListBean>> violations = validator.validate(bean);
+
+    assertTrue(violations.isEmpty());
+  }
+
+  @Test
+  void givenListWithInvalidElement_whenValidating_thenViolation() {
+    ListBean bean = new ListBean(List.of("A", "X"));
+
+    Set<ConstraintViolation<ListBean>> violations = validator.validate(bean);
+
+    assertEquals(1, violations.size());
+    assertEquals("must be one of [A, B, C]", violations.iterator().next().getMessage());
+  }
+
+  @Test
+  void givenNullList_whenValidating_thenNoViolation() {
+    ListBean bean = new ListBean(null);
+
+    Set<ConstraintViolation<ListBean>> violations = validator.validate(bean);
 
     assertTrue(violations.isEmpty());
   }

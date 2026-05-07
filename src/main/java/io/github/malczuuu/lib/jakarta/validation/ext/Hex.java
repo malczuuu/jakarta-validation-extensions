@@ -32,62 +32,65 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for validating that a value is one of a specified set of allowed values.
+ * Annotation for validating that a {@code CharSequence} value is a valid hexadecimal string.
+ *
+ * <p>Each character must be in the range {@code 0–9}, {@code a–f}, or {@code A–F}. Mixed case is
+ * accepted.
+ *
+ * <p>Accepted values include:
+ *
+ * <ul>
+ *   <li>{@code ff00aa} - lowercase
+ *   <li>{@code FF00AA} - uppercase
+ *   <li>{@code deadBEEF} - mixed case
+ * </ul>
+ *
+ * <p>Rejected values include:
+ *
+ * <ul>
+ *   <li>{@code #ff00aa} - leading {@code #} is not accepted
+ *   <li>{@code 0x1a} - {@code 0x} prefix is not accepted
+ *   <li>{@code gg} - invalid hex characters
+ * </ul>
  *
  * <p>Supported types are:
  *
  * <ul>
  *   <li>{@code CharSequence} ({@code String} in particular, but also {@code StringBuilder} etc.)
- *   <li>{@code Enum}
- *   <li>{@code Number} (compared to {@code values} with {@code Number::toString})
- *   <li>{@code Character}
  * </ul>
  *
- * <p>{@code null} elements are considered valid.
+ * <p>Empty strings and {@code null} elements are considered valid.
  *
- * <p>Example usages:
+ * <p>Example usage:
  *
  * <pre>
- * // Restrict a String to a fixed set of values
- * &#064;OneOf(values = {"PENDING", "ACTIVE", "INACTIVE"})
- * private String status;
- *
- * // Case-insensitive matching
- * &#064;OneOf(values = {"asc", "desc"}, ignoreCase = true)
- * private String sortOrder;
- *
- * // Derive allowed values from all constants of an enum
- * &#064;OneOf(enumType = Status.class)
- * private String status;
- *
- * // Validate an enum field against a subset of its constants
- * &#064;OneOf(values = {"PENDING", "ACTIVE"})
- * private Status status;
+ * &#064;Hex
+ * private String checksum;
  * </pre>
  *
- * @since 1.0.0
+ * @since 1.2.0
  */
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
-@Repeatable(OneOf.List.class)
+@Repeatable(Hex.List.class)
 @Documented
-@Constraint(validatedBy = OneOfValidator.class)
-public @interface OneOf {
+@Constraint(validatedBy = HexValidator.class)
+public @interface Hex {
 
   /**
    * Returns the error message template.
    *
    * @return the error message template, which can be a literal message or a message key in a
    *     resource bundle
-   * @since 1.0.0
+   * @since 1.2.0
    */
-  String message() default "must be one of {values}";
+  String message() default "must be a valid hexadecimal string";
 
   /**
    * Returns the validation groups to which this constraint belongs.
    *
    * @return the validation groups to which this constraint belongs
-   * @since 1.0.0
+   * @since 1.2.0
    */
   Class<?>[] groups() default {};
 
@@ -95,39 +98,15 @@ public @interface OneOf {
    * Returns the payload with which the constraint violation can be associated.
    *
    * @return the payload with which the constraint violation can be associated
-   * @since 1.0.0
+   * @since 1.2.0
    */
   Class<? extends Payload>[] payload() default {};
 
   /**
-   * Returns the allowed values for the annotated element.
+   * Defines several {@link Hex} annotations on the same element.
    *
-   * @return allowed values for the annotated element
-   * @since 1.0.0
-   */
-  String[] values() default {};
-
-  /**
-   * Returns the enum class to use for deriving the allowed values.
-   *
-   * @return the {@code Enum} class to use for validating the annotated element
-   * @since 1.0.0
-   */
-  Class<?> enumType() default Void.class;
-
-  /**
-   * Returns whether to ignore case when validating {@code String} or {@code Enum} values.
-   *
-   * @return whether to ignore case when validating {@code String} or {@code Enum} values.
-   * @since 1.0.0
-   */
-  boolean ignoreCase() default false;
-
-  /**
-   * Defines several {@link OneOf} annotations on the same element.
-   *
-   * @see OneOf
-   * @since 1.0.0
+   * @see Hex
+   * @since 1.2.0
    */
   @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
   @Retention(RUNTIME)
@@ -135,11 +114,11 @@ public @interface OneOf {
   @interface List {
 
     /**
-     * Returns the contained {@link OneOf} annotations.
+     * Returns the contained {@link Hex} annotations.
      *
-     * @return array of {@link OneOf} annotations
-     * @since 1.0.0
+     * @return array of {@link Hex} annotations
+     * @since 1.2.0
      */
-    OneOf[] value();
+    Hex[] value();
   }
 }
