@@ -1,13 +1,20 @@
 [versions]
+errorprone = "2.49.0"
+errorprone-plugin = "5.1.0"
+expressly = "6.0.0"
 hibernate-validator = "8.0.3.Final"
 idea-ext = "1.4.1"
 jakarta-validation-api = "3.1.1"
 jspecify = "1.0.0"
 junit = "6.0.3"
+log4j2 = "2.24.3"
 nmcp = "1.5.0"
+nullaway = "0.13.4"
+slf4j = "2.0.17"
 spotless = "8.4.0"
 
 [plugins]
+errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }
 idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "idea-ext" }
 nmcp = { id = "com.gradleup.nmcp", version.ref = "nmcp" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
@@ -15,11 +22,21 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 [libraries]
 # BOMs
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+log4j2-bom = { module = "org.apache.logging.log4j:log4j-bom", version.ref = "log4j2" }
 
 # direct versions
+errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta-validation-api" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
+expressly = { module = "org.glassfish.expressly:expressly", version.ref = "expressly" }
 hibernate-validator = { module = "org.hibernate.validator:hibernate-validator", version.ref = "hibernate-validator" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 
 # versions managed by junit-bom
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+# versions managed by log4j2-bom
+log4j-core = { module = "org.apache.logging.log4j:log4j-core" }
+log4j-slf4j2-impl = { module = "org.apache.logging.log4j:log4j-slf4j2-impl" }

@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    implementation(plugin(libs.plugins.errorprone))
     implementation(plugin(libs.plugins.idea.ext))
 }
 

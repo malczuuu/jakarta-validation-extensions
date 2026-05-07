@@ -1,6 +1,7 @@
 import com.diffplug.spotless.LineEnding
 
 plugins {
+    id("internal.errorprone-convention")
     id("internal.idea-convention")
     id("internal.jacoco-convention")
     id("internal.java-library-convention")
@@ -9,16 +10,24 @@ plugins {
     alias(libs.plugins.nmcp)
 }
 
-group = "io.github.malczuuu"
-
 dependencies {
     api(libs.jakarta.validation.api)
+
+    compileOnly(libs.jspecify)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
 
     testImplementation(libs.hibernate.validator)
+    testRuntimeOnly(libs.expressly)
+    testImplementation(libs.slf4j.api)
+    testImplementation(platform(libs.log4j2.bom))
+    testImplementation(libs.log4j.core)
+    testRuntimeOnly(libs.log4j.slf4j2.impl)
+
+    errorprone(libs.errorprone.core)
+    errorprone(libs.nullaway)
 }
 
 internalPublishing {
@@ -49,7 +58,7 @@ spotless {
     kotlin {
         target("**/src/**/*.kt")
 
-        ktfmt("0.59").metaStyle()
+        ktfmt("0.61").metaStyle()
         endWithNewline()
         lineEndings = LineEnding.UNIX
     }
